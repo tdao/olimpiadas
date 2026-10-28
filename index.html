@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olimpiadas de Matemática — Sexto de Primaria</title>
+<style>
+:root{--azul:#174a8b;--celeste:#eaf4ff;--amarillo:#ffd65a;--verde:#16794b;--rojo:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eaf4ff,#fff7d6);color:#182334}
+header{background:var(--azul);color:white;text-align:center;padding:22px 14px}
+header h1{margin:0 0 8px;font-size:clamp(1.35rem,4vw,2rem)}header p{margin:0}
+main{max-width:900px;margin:22px auto;padding:0 14px 35px}
+.card{background:white;border-radius:18px;padding:22px;margin:14px 0;box-shadow:0 5px 18px #17385b18}
+label{font-weight:bold;display:block;margin-bottom:8px}
+input[type=text]{width:100%;max-width:500px;padding:12px;border:2px solid #b8cde6;border-radius:10px;font-size:1rem}
+button{border:0;border-radius:10px;padding:12px 18px;font-size:1rem;font-weight:bold;cursor:pointer;margin:6px 5px 6px 0;background:var(--azul);color:white}
+button:hover{filter:brightness(1.1)}button:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:#526579}.gold{background:#a96a00}.green{background:var(--verde)}
+.progress-wrap{height:12px;background:#e3eaf2;border-radius:99px;overflow:hidden;margin:14px 0}
+#progress{height:100%;width:0;background:#21a366;transition:width .25s}
+.meta{display:flex;gap:12px;flex-wrap:wrap;color:#45566b;font-weight:bold}
+.tag{background:var(--celeste);padding:6px 10px;border-radius:99px}
+.question{font-size:1.15rem;line-height:1.55;margin:18px 0}
+.options{display:grid;gap:10px}
+.option{border:2px solid #d8e2ef;border-radius:11px;padding:12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.option:hover{background:#f5f9ff}.option input{margin-top:4px;transform:scale(1.2)}
+.feedback{padding:12px;border-radius:10px;margin-top:12px;font-weight:bold}
+.correct{background:#e4f7eb;color:#12643d}.incorrect{background:#fff0ee;color:#9e241b}
+.hidden{display:none!important}
+#diploma{background:#fffdf5;border:10px double #c28b18;padding:28px;text-align:center;color:#17345c;margin-top:18px}
+#diploma h2{font-family:Georgia,serif;font-size:clamp(1.6rem,5vw,2.5rem);color:#a56c00;margin:8px 0}
+#diploma .student{font-size:1.8rem;font-family:Georgia,serif;color:#174a8b;border-bottom:1px solid #c28b18;display:inline-block;padding:6px 20px;margin:12px}
+#diploma .seal{font-size:2.4rem}
+.small{font-size:.9rem;color:#536579}
+@media print{body{background:white}header,main>.card:not(#results),#results>button,.no-print{display:none!important}main{margin:0;max-width:none;padding:0}#results{display:block!important;box-shadow:none;padding:0}#diploma{display:block!important;page-break-inside:avoid;margin:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 Olimpiadas de Matemática</h1>
+  <p>Sexto de Primaria · 50 retos de razonamiento lógico</p>
+</header>
+<main>
+<section class="card" id="start">
+  <h2>¡Prepárate para el desafío! 🧠</h2>
+  <p>Lee con atención, piensa paso a paso y elige una sola respuesta por pregunta. El banco incluye operaciones, divisibilidad, geometría, fracciones y problemas de razonamiento.</p>
+  <label for="studentName">Nombre completo del estudiante:</label>
+  <input id="studentName" type="text" maxlength="90" placeholder="Escribe tu nombre y apellido" autocomplete="name">
+  <p class="small">Recibirás un certificado al completar cada bloque de 25 preguntas. Puedes imprimirlo o guardarlo como PDF y después continuar con el siguiente bloque.</p>
+  <button id="startBtn">Comenzar desafío</button>
+  <p id="nameError" class="feedback incorrect hidden">Por favor, escribe tu nombre para comenzar.</p>
+</section>
+
+<section class="card hidden" id="quiz">
+  <div class="meta"><span class="tag" id="counter">Pregunta 1 de 50</span><span class="tag" id="topic">Tema</span><span class="tag" id="score">Aciertos: 0</span></div>
+  <div class="progress-wrap"><div id="progress"></div></div>
+  <div id="question" class="question"></div>
+  <div id="options" class="options"></div>
+  <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+  <div style="margin-top:16px">
+    <button id="checkBtn">Comprobar respuesta</button>
+    <button id="nextBtn" class="green hidden">Siguiente pregunta →</button>
+  </div>
+  <p class="small">Consejo: antes de responder, identifica los datos importantes y la operación que necesitas.</p>
+</section>
+
+<section class="card hidden" id="results">
+  <h2 id="resultsTitle">🎉 ¡Bloque completado!</h2>
+  <p id="summary"></p>
+  <div id="diploma">
+    <div class="seal">🏅 ⭐ 🏅</div>
+    <h2>Certificado de participación y logro</h2>
+    <p>Se otorga el presente diploma a:</p>
+    <div class="student" id="diplomaName"></div>
+    <p id="certificateDescription"></p>
+    <p><strong>Cantidad de aciertos:</strong> <span id="diplomaScore"></span> de 25</p>
+    <p><strong>Profesora:</strong> Zulema E. Rivero Salas</p>
+    <p>¡Felicitaciones por tu esfuerzo, perseverancia y pensamiento matemático!</p>
+    <p class="small" id="certificateBlock"></p>
+  </div>
+  <button class="gold" id="printBtn">🖨️ Imprimir o guardar certificado en PDF</button>
+  <button class="green hidden" id="continueBtn">Continuar con las preguntas 26 a 50 →</button>
+  <button class="secondary hidden" id="firstCertificateBtn">Ver certificado del primer bloque</button>
+  <button class="secondary" id="restartBtn">Volver a comenzar</button>
+</section>
+</main>
+<script>
+const questions = [
+{t:"Operaciones con números naturales",q:"En una biblioteca hay 248 libros de cuentos y 176 libros de ciencia. Si se prestan 95 libros, ¿cuántos quedan?",o:["329","419","519","324"],a:0,e:"248 + 176 = 424; 424 − 95 = 329."},
+{t:"Operaciones con números naturales",q:"Una escuela compra 18 cajas con 24 lápices cada una. Si reparte todos los lápices entre 12 cursos por igual, ¿cuántos recibe cada curso?",o:["24","36","42","48"],a:1,e:"18 × 24 = 432; 432 ÷ 12 = 36."},
+{t:"Operaciones con números naturales",q:"Un agricultor recoge 1.275 naranjas por la mañana y 986 por la tarde. ¿Cuántas naranjas recoge en total?",o:["2.151","2.261","2.361","2.251"],a:1,e:"1.275 + 986 = 2.261."},
+{t:"Operaciones con números naturales",q:"Un autobús tiene 48 asientos. Si salen 7 autobuses completos y luego suben 26 pasajeros a otro autobús, ¿cuántos pasajeros viajan?",o:["336","362","384","310"],a:1,e:"7 × 48 = 336; 336 + 26 = 362."},
+{t:"MCM y MCD",q:"Dos campanas suenan cada 6 y 8 minutos. Si suenan juntas ahora, ¿en cuántos minutos volverán a sonar juntas?",o:["12","14","24","48"],a:2,e:"El MCM de 6 y 8 es 24."},
+{t:"MCM y MCD",q:"Se quieren repartir 36 manzanas y 48 peras en bolsas iguales, sin que sobre ninguna fruta. ¿Cuál es el mayor número de bolsas que se puede preparar?",o:["6","8","12","18"],a:2,e:"El MCD de 36 y 48 es 12."},
+{t:"MCM y MCD",q:"Un semáforo cambia cada 15 segundos y otro cada 20 segundos. Si cambian juntos ahora, ¿cuándo coincidirán otra vez?",o:["30 s","45 s","60 s","90 s"],a:2,e:"MCM(15,20) = 60 segundos."},
+{t:"MCM y MCD",q:"¿Cuál es el MCD de 42 y 56?",o:["7","14","21","28"],a:1,e:"42 = 3 × 14 y 56 = 4 × 14; el MCD es 14."},
+{t:"MCM y MCD",q:"Ana visita a su abuela cada 4 días y Luis cada 10 días. Si hoy coinciden, ¿en cuántos días volverán a coincidir?",o:["14","20","30","40"],a:1,e:"MCM(4,10) = 20 días."},
+{t:"Lectura numérica",q:"¿Cómo se lee el número 305.072?",o:["Tres millones cinco mil setenta y dos","Trescientos cinco mil setenta y dos","Treinta y cinco mil setenta y dos","Trescientos cinco mil setecientos dos"],a:1,e:"305.072 se lee: trescientos cinco mil setenta y dos."},
+{t:"Lectura numérica",q:"¿Qué número corresponde a “cuatrocientos ocho mil treinta y seis”?",o:["480.036","408.360","408.036","400.836"],a:2,e:"408.036 = 408 mil + 36."},
+{t:"Lectura numérica",q:"En 7.452.189, ¿qué valor tiene la cifra 5?",o:["5.000","50.000","500.000","5.000.000"],a:1,e:"El 5 está en la posición de decenas de millar: 50.000."},
+{t:"Lectura numérica",q:"¿Cuál es el mayor número que se puede formar con las cifras 2, 0, 7, 4 y 9, sin repetirlas?",o:["97.420","97.402","94.720","79.420"],a:0,e:"Ordenamos las cifras de mayor a menor: 97.420."},
+{t:"Lectura numérica",q:"¿Cuál es el número inmediatamente anterior a 100.000?",o:["99.000","99.999","100.001","90.999"],a:1,e:"El anterior a 100.000 es 99.999."},
+{t:"Operaciones combinadas",q:"Resuelve: 36 ÷ 6 + 4 × 5.",o:["50","26","30","20"],a:1,e:"Primero división y multiplicación: 6 + 20 = 26."},
+{t:"Operaciones combinadas",q:"Resuelve: (18 + 12) ÷ 5 × 3.",o:["6","15","18","30"],a:2,e:"Paréntesis: 30; luego 30 ÷ 5 × 3 = 6 × 3 = 18."},
+{t:"Operaciones combinadas",q:"Una tienda tiene 5 paquetes de 12 cuadernos y vende 17. ¿Qué operación representa cuántos quedan?",o:["5 × (12 − 17)","(5 × 12) − 17","5 + 12 − 17","5 × 12 + 17"],a:1,e:"Hay 5 × 12 = 60 cuadernos; 60 − 17 = 43."},
+{t:"Operaciones combinadas",q:"Calcula: 72 − 8 × 6 + 10.",o:["394","34","58","22"],a:1,e:"Primero 8 × 6 = 48; después 72 − 48 + 10 = 34."},
+{t:"Operaciones combinadas",q:"Resuelve: 100 − (24 ÷ 4 + 7) × 3.",o:["61","79","73","39"],a:0,e:"24 ÷ 4 = 6; 6 + 7 = 13; 100 − 13 × 3 = 61."},
+{t:"Polígonos: perímetros y superficies",q:"Un rectángulo mide 12 cm de largo y 7 cm de ancho. ¿Cuál es su perímetro?",o:["19 cm","38 cm","84 cm","42 cm"],a:1,e:"P = 2 × (12 + 7) = 38 cm."},
+{t:"Polígonos: perímetros y superficies",q:"Un terreno cuadrado tiene 9 m por lado. ¿Cuál es su superficie?",o:["18 m²","36 m²","81 m²","72 m²"],a:2,e:"Área del cuadrado = 9 × 9 = 81 m²."},
+{t:"Polígonos: perímetros y superficies",q:"Un triángulo tiene lados de 8 cm, 11 cm y 13 cm. ¿Cuál es su perímetro?",o:["24 cm","30 cm","32 cm","34 cm"],a:2,e:"8 + 11 + 13 = 32 cm."},
+{t:"Polígonos: perímetros y superficies",q:"Un patio rectangular mide 15 m por 6 m. ¿Cuántos metros cuadrados de baldosa se necesitan para cubrirlo?",o:["21 m²","42 m²","90 m²","180 m²"],a:2,e:"Área = 15 × 6 = 90 m²."},
+{t:"Polígonos: perímetros y superficies",q:"Un hexágono regular tiene lados de 5 cm. ¿Cuál es su perímetro?",o:["25 cm","30 cm","35 cm","20 cm"],a:1,e:"Tiene 6 lados iguales: 6 × 5 = 30 cm."},
+{t:"Operaciones con números decimales",q:"Calcula: 12,75 + 8,6.",o:["20,81","21,35","21,25","20,35"],a:1,e:"12,75 + 8,60 = 21,35."},
+{t:"Operaciones con números decimales",q:"Una cinta mide 15,8 m. Se cortan 6,45 m. ¿Cuánto queda?",o:["9,35 m","9,45 m","10,35 m","8,45 m"],a:0,e:"15,80 − 6,45 = 9,35 m."},
+{t:"Operaciones con números decimales",q:"Cada cuaderno cuesta Bs 7,50. ¿Cuánto cuestan 4 cuadernos?",o:["Bs 28","Bs 30","Bs 32,50","Bs 35"],a:1,e:"7,50 × 4 = Bs 30."},
+{t:"Operaciones con números decimales",q:"Se reparten 8,4 litros de jugo en 6 jarras iguales. ¿Cuántos litros recibe cada jarra?",o:["1,2 L","1,4 L","1,6 L","2,4 L"],a:1,e:"8,4 ÷ 6 = 1,4 litros."},
+{t:"Operaciones con números decimales",q:"María compra un pan por Bs 2,75 y leche por Bs 8,50. Si paga con Bs 20, ¿cuánto recibe de cambio?",o:["Bs 8,25","Bs 8,75","Bs 9,25","Bs 10,75"],a:1,e:"2,75 + 8,50 = 11,25; 20 − 11,25 = Bs 8,75."},
+{t:"Potencias y raíces",q:"¿Cuánto es 6²?",o:["12","18","36","64"],a:2,e:"6² = 6 × 6 = 36."},
+{t:"Potencias y raíces",q:"¿Cuál es la raíz cuadrada de 144?",o:["10","11","12","14"],a:2,e:"12 × 12 = 144."},
+{t:"Potencias y raíces",q:"¿Cuál es el valor de 2³ + 3²?",o:["13","17","25","36"],a:1,e:"2³ = 8 y 3² = 9; 8 + 9 = 17."},
+{t:"Potencias y raíces",q:"¿Cuál es la raíz cúbica de 125?",o:["3","4","5","25"],a:2,e:"5 × 5 × 5 = 125."},
+{t:"Potencias y raíces",q:"Una caja cúbica tiene un volumen de 64 cm³. Si todos sus lados miden lo mismo, ¿cuánto mide cada arista?",o:["4 cm","8 cm","16 cm","32 cm"],a:0,e:"La raíz cúbica de 64 es 4, porque 4³ = 64."},
+{t:"Fracciones",q:"¿Cuánto es 1/2 + 1/4?",o:["2/6","3/4","1/6","2/4"],a:1,e:"1/2 = 2/4; 2/4 + 1/4 = 3/4."},
+{t:"Fracciones",q:"Una pizza se divide en 8 porciones iguales. Si se comen 3, ¿qué fracción queda?",o:["3/8","5/8","1/8","5/3"],a:1,e:"Quedan 8 − 3 = 5 porciones: 5/8."},
+{t:"Fracciones",q:"¿Cuánto es 3/5 de 40?",o:["8","15","24","30"],a:2,e:"40 ÷ 5 = 8; 8 × 3 = 24."},
+{t:"Fracciones",q:"Resuelve: 2/3 × 3/4.",o:["1/2","5/7","6/7","3/8"],a:0,e:"(2 × 3)/(3 × 4) = 6/12 = 1/2."},
+{t:"Fracciones",q:"¿Cuál fracción es equivalente a 3/4?",o:["6/10","9/12","12/20","5/8"],a:1,e:"3/4 × 3/3 = 9/12."},
+{t:"Porcentajes",q:"En un curso de 40 estudiantes, el 25 % participa en el coro. ¿Cuántos estudiantes son?",o:["5","10","15","20"],a:1,e:"25 % es la cuarta parte: 40 ÷ 4 = 10."},
+{t:"Porcentajes",q:"Una mochila cuesta Bs 200 y tiene un descuento del 10 %. ¿Cuánto se descuenta?",o:["Bs 10","Bs 20","Bs 30","Bs 40"],a:1,e:"10 % de 200 = Bs 20."},
+{t:"Porcentajes",q:"De 80 preguntas, Pablo respondió correctamente el 75 %. ¿Cuántas acertó?",o:["50","55","60","65"],a:2,e:"75 % de 80 = 0,75 × 80 = 60."},
+{t:"Porcentajes",q:"Una biblioteca tiene 300 libros. El 20 % son de ciencia. ¿Cuántos libros de ciencia hay?",o:["30","50","60","80"],a:2,e:"20 % de 300 = 60."},
+{t:"Porcentajes",q:"Un artículo cuesta Bs 150. Su precio aumenta un 10 %. ¿Cuál es el nuevo precio?",o:["Bs 155","Bs 160","Bs 165","Bs 170"],a:2,e:"10 % de 150 = 15; 150 + 15 = Bs 165."},
+{t:"Regla de tres simple",q:"Si 4 cuadernos cuestan Bs 28, ¿cuánto cuestan 7 cuadernos al mismo precio unitario?",o:["Bs 42","Bs 49","Bs 56","Bs 35"],a:1,e:"Cada cuaderno cuesta 28 ÷ 4 = Bs 7; 7 × 7 = Bs 49."},
+{t:"Regla de tres simple",q:"Una máquina fabrica 120 piezas en 3 horas. Al mismo ritmo, ¿cuántas fabrica en 5 horas?",o:["180","200","220","240"],a:1,e:"120 ÷ 3 = 40 por hora; 40 × 5 = 200."},
+{t:"Regla de tres simple",q:"Para preparar jugo para 6 personas se usan 900 ml de agua. ¿Cuánta agua se necesita para 10 personas?",o:["1.200 ml","1.400 ml","1.500 ml","1.800 ml"],a:2,e:"900 ÷ 6 = 150 ml por persona; 150 × 10 = 1.500 ml."},
+{t:"Razones y proporciones",q:"En una caja hay 12 bolas rojas y 8 azules. ¿Cuál es la razón de rojas a azules simplificada?",o:["2:3","3:2","12:20","8:12"],a:1,e:"12:8 se simplifica dividiendo ambos términos entre 4: 3:2."},
+{t:"Razones y proporciones",q:"La razón entre niñas y niños en un grupo es 3:2. Si hay 15 niñas, ¿cuántos niños hay?",o:["8","10","12","15"],a:1,e:"3 partes equivalen a 15, entonces 1 parte = 5; 2 partes = 10."},
+{t:"Problemas matemáticos",q:"Un número multiplicado por 4 y luego aumentado en 6 da 34. ¿Cuál es el número?",o:["6","7","8","10"],a:1,e:"4x + 6 = 34; 4x = 28; x = 7."}
+];
+let index=0, score=0, firstBlockScore=0, answered=false, student="";
+const $=id=>document.getElementById(id);
+$("startBtn").addEventListener("click",()=>{
+  student=$("studentName").value.trim();
+  if(!student){$("nameError").classList.remove("hidden");$("studentName").focus();return}
+  $("nameError").classList.add("hidden");$("start").classList.add("hidden");$("quiz").classList.remove("hidden");render();
+});
+function render(){
+  answered=false;const q=questions[index];
+  $("counter").textContent=`Pregunta ${index+1} de ${questions.length}`;
+  $("topic").textContent=q.t;$("score").textContent=`Aciertos: ${score}`;
+  $("progress").style.width=`${index/questions.length*100}%`;
+  $("question").textContent=q.q;$("options").innerHTML="";
+  q.o.forEach((option,i)=>{
+    const label=document.createElement("label");label.className="option";
+    label.innerHTML=`<input type="radio" name="answer" value="${i}"><span><strong>${String.fromCharCode(65+i)}.</strong> ${option}</span>`;
+    $("options").appendChild(label);
+  });
+  $("feedback").classList.add("hidden");$("checkBtn").classList.remove("hidden");$("nextBtn").classList.add("hidden");
+  $("nextBtn").textContent=(index+1)%25===0?"Ver certificado del bloque 🏅":"Siguiente pregunta →";
+}
+$("checkBtn").addEventListener("click",()=>{
+  if(answered)return;const selected=document.querySelector('input[name="answer"]:checked');
+  if(!selected){$("feedback").textContent="Selecciona una respuesta antes de comprobar."; $("feedback").className="feedback incorrect";return}
+  answered=true;const q=questions[index],correct=Number(selected.value)===q.a;
+  if(correct)score++;
+  document.querySelectorAll('input[name="answer"]').forEach(el=>el.disabled=true);
+  $("score").textContent=`Aciertos: ${score}`;
+  $("feedback").textContent=(correct?"¡Muy bien! Respuesta correcta. ":"Repasa y aprende. Respuesta correcta: "+q.o[q.a]+". ")+q.e;
+  $("feedback").className="feedback "+(correct?"correct":"incorrect");
+  $("checkBtn").classList.add("hidden");$("nextBtn").classList.remove("hidden");
+});
+$("nextBtn").addEventListener("click",()=>{
+  if(!answered)return;
+  answered=false;
+  index++;
+  if(index===25){firstBlockScore=score;showCertificate(25)}
+  else if(index>=questions.length){showCertificate(50)}
+  else{render()}
+});
+function showCertificate(completed){
+  const first=completed===25;
+  const block=first?1:2;
+  const blockScore=first?firstBlockScore:score-firstBlockScore;
+  $("quiz").classList.add("hidden");$("results").classList.remove("hidden");
+  $("resultsTitle").textContent=first?"🏅 ¡Primer bloque completado!":"🎉 ¡Desafío terminado!";
+  $("summary").textContent=`${student}, lograste ${blockScore} aciertos de 25 en el bloque ${block}.`+(first?" Imprime o guarda tu certificado y continúa con el segundo bloque.":` Total del desafío: ${score} aciertos de 50.`);
+  $("diplomaName").textContent=student;
+  $("diplomaScore").textContent=blockScore;
+  $("certificateDescription").textContent=`Por completar las 25 preguntas del bloque ${block} (preguntas ${first?"1 a 25":"26 a 50"}) de razonamiento lógico matemático.`;
+  $("certificateBlock").textContent=`Sexto de Primaria · Olimpiadas de Matemática · Certificado ${block} de 2`;
+  $("continueBtn").classList.toggle("hidden",!first);
+  $("continueBtn").textContent=index>=questions.length?"Volver al certificado del segundo bloque":"Continuar con las preguntas 26 a 50 →";
+  $("firstCertificateBtn").classList.toggle("hidden",first);
+}
+$("continueBtn").addEventListener("click",()=>{
+  if(index>=questions.length){showCertificate(50);return}
+  $("results").classList.add("hidden");$("quiz").classList.remove("hidden");render();
+});
+$("firstCertificateBtn").addEventListener("click",()=>showCertificate(25));
+$("printBtn").addEventListener("click",()=>window.print());
+$("restartBtn").addEventListener("click",()=>{index=0;score=0;firstBlockScore=0;answered=false;student="";$("studentName").value="";$("results").classList.add("hidden");$("start").classList.remove("hidden");$("quiz").classList.add("hidden");});
+</script>
+</body>
+</html>
